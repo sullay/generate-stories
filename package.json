@@ -1,0 +1,16 @@
+{
+  "name": "generate-stories",
+  "version": "1.0.2",
+  "description": "",
+  "bin": {
+    "generate-stories": "./index.js"
+  },
+  "keywords": [
+    "storybook"
+  ],
+  "author": "sullay",
+  "license": "MIT",
+  "dependencies": {
+    "minimist": "^1.2.8"
+  }
+}
