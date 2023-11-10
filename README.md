@@ -8,7 +8,7 @@
 使用Node.js运行脚本，并为您的Vue组件目录和故事文件的输出目录提供必要的参数。
 
 ``` bash
-node generate-stories.js -v path/to/vue/components -o path/to/storybook/stories
+npx generate-stories -v path/to/vue/components -o path/to/storybook/stories
 ```
 
 ## 选项

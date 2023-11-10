@@ -7,7 +7,7 @@ This script automates the process of creating Storybook stories for Vue.js compo
 Run the script with Node.js, providing the necessary arguments for your Vue components directory and the output directory for the story files.
 
 ``` bash
-node generate-stories.js -v path/to/vue/components -o path/to/storybook/stories
+npx generate-stories -v path/to/vue/components -o path/to/storybook/stories
 ```
 
 ## Options
