@@ -1,6 +1,6 @@
 {
   "name": "generate-stories",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "bin": {
     "generate-stories": "./index.js"
