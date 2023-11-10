@@ -110,8 +110,8 @@ function generateStoryContent(componentName, storyData, vueFilePath, fullPath) {
 Default.args = {};`;
 
   // 使用提取的键生成参数对象
-  const controlsParameters = 
-  `parameters: {
+  const controlsParameters =
+    `parameters: {
     controls: { include: ${JSON.stringify(controlsKeys)} }
   },`
 
@@ -120,21 +120,20 @@ import ${componentName} from '${importPath}';
 import { useRouter } from 'vue-router';
 import { reactive, watch } from 'vue';
 
-function extractAfterPropsPrefix(inputString) {
-  const prefix = 'props.';
+function extractAfterPrefix(prefix, inputString) {
   if (inputString.startsWith(prefix)) {
-    return inputString.substring(prefix.length);
+      return inputString.substring(prefix.length);
   }
   return '';
 }
 
-function buildProps(args) {
-    const props = {}
-    Object.keys(args).forEach((key) => {
-        let prop = extractAfterPropsPrefix(key);
-        if (prop) props[prop] = args[key];
-    });
-    return props;
+function buildData(args, prefix) {
+  const data = {};
+  Object.keys(args).forEach((argsKey) => {
+      const key = extractAfterPrefix(prefix + '.', argsKey);
+      if (key) data[key] = args[argsKey];
+  });
+  return data;
 }
 
 export default {
@@ -147,6 +146,9 @@ export default {
 class Template {
     render(args) {
         const props = reactive({});
+        Object.assign(window, buildData(args, 'window'));
+        Object.entries(buildData(args, 'localStorage')).forEach(([key, val]) => localStorage.setItem(key, val));
+        Object.entries(buildData(args, 'sessionStorage')).forEach(([key, val]) => sessionStorage.setItem(key, val));
         return {
             components: { ${componentName} },
             setup() {
@@ -155,7 +157,7 @@ class Template {
                     if (newArgs.url) {
                         router.replace(newArgs.url);
                     }
-                    Object.assign(props, buildProps(newArgs));
+                    Object.assign(props, buildData(newArgs, 'props'));
                 }, { immediate: true });
                 return { props };
             },
@@ -170,27 +172,51 @@ ${defaultExport}
 
 // Function to generate additional exports based on story data
 function generateExport(story) {
-  const { title, props = {}, url } = story;
+  const {
+    title, props = {}, url,
+    window: windowOverrides = {}, 
+    localStorage: localStorageOverrides = {}, 
+    sessionStorage: sessionStorageOverrides = {}
+  } = story;
+
+  // 创建故事特定的参数对象
+  const storyArgs = {
+    ...buildPropArgs(windowOverrides, 'window'),
+    ...buildPropArgs(localStorageOverrides, 'localStorage'),
+    ...buildPropArgs(sessionStorageOverrides, 'sessionStorage'),
+    ...buildPropArgs(props, 'props'),
+    url
+  };
+
   return `
 export const ${title} = new Template();
-${title}.args = ${JSON.stringify({ ...Object.keys(props).reduce((acc, key) => ({ ...acc, [`props.${key}`]: props[key] }), {}), url }, null, 2)};
+${title}.args = ${JSON.stringify(storyArgs, null, 2)};
 `;
 }
 
-function extractControlsKeys(storyData) {
-  const keysSet = new Set();
-  
-  storyData.forEach(item => {
-    if (item.props) {
-      Object.keys(item.props).forEach(prop => {
-        keysSet.add(`props.${prop}`);
-      });
-    }
-    if (item.url) {
-      keysSet.add('url');
-    }
-  });
+function buildPropArgs(obj, prefix) {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    acc[`${prefix}.${key}`] = value;
+    return acc;
+  }, {});
+}
 
+function extractControlsKeys(storyData) {
+  const nonKeysSet = new Set(['title'])
+  const keysSet = new Set();
+
+  for (const data of storyData) {
+    Object.keys(data).forEach(key => {
+      if (nonKeysSet.has(key)) return;
+      if (data[key] instanceof Object) {
+        Object.keys(data[key]).forEach(itemKey => {
+          keysSet.add(`${key}.${itemKey}`);
+        })
+      } else {
+        keysSet.add(key)
+      }
+    });
+  }
   return Array.from(keysSet); // 转换回数组
 }
 
