@@ -18,14 +18,15 @@ node generate-stories.js -v path/to/vue/components -o path/to/storybook/stories
 - --help, -h：显示帮助信息。
 
 ## .stories.json 配置说明
-要为您的Vue.js组件定义故事，请在组件文件所在的同一目录下创建一个与组件同名的.stories.json文件。该JSON文件应包含一个对象数组，每个对象代表一个故事及其自己的属性集（props）、window、localStorage 和 sessionStorage 设置。
+要为您的Vue.js组件定义故事，请在组件文件所在的同一目录下创建一个与组件同名的.stories.json文件。该JSON文件应包含一个对象数组，每个对象代表一个故事及其自己的属性集props、url、window、localStorage 和 sessionStorage 设置。
 
 数组中的每个对象可以包含以下键：
 
 - title：故事的名称。
-- props：一个包含组件期望的响应式属性的对象。
+- props：vue props对象。
 - window：一个对象，用于为故事设置window全局对象的属性。
 - localStorage 和 sessionStorage：对象，用于为故事在Web存储中设置键值对。
+- url：一个字符串，用于为故事设置当前页面的前端路由。
 
 以下是一个.stories.json文件的例子：
 
@@ -47,7 +48,8 @@ node generate-stories.js -v path/to/vue/components -o path/to/storybook/stories
         },
         "localStorage": {
             "key": "abc"
-        }
+        },
+        "url": "/your-path-here"
     },
     {
         "title": "disabled_false",
@@ -62,7 +64,8 @@ node generate-stories.js -v path/to/vue/components -o path/to/storybook/stories
         },
         "localStorage": {
             "key": "xyz"
-        }
+        },
+        "url": "/your-path-here"
     }
 ]
 

@@ -16,14 +16,15 @@ node generate-stories.js -v path/to/vue/components -o path/to/storybook/stories
 - --help, -h: Display the help information.
 
 ## .stories.json Configuration
-To define the stories for your Vue.js components, create a .stories.json file in the same directory as your component file and with the same name. This JSON file should contain an array of objects, each representing a story with its own set of properties (props), window, localStorage, and sessionStorage settings.
+To define the stories for your Vue.js components, create a .stories.json file in the same directory as your component file and with the same name. This JSON file should contain an array of objects, each representing a story with its own set of properties props, url, window, localStorage, and sessionStorage settings.
 
 Each object in the array can contain the following keys:
 
 - title: The name of the story.
-- props: An object containing the reactive properties that your component expects.
+- props: vue props.
 - window: An object to set properties on the window global object for the story.
 - localStorage and sessionStorage: Objects to set key-value pairs in the web storage for the 
+- url: A string to set the front-end route of the current page for the story.
 
 以下是一个.stories.json文件的例子：
 
@@ -45,7 +46,8 @@ Each object in the array can contain the following keys:
         },
         "localStorage": {
             "key": "abc"
-        }
+        },
+        "url": "/your-path-here"
     },
     {
         "title": "disabled_false",
@@ -60,7 +62,8 @@ Each object in the array can contain the following keys:
         },
         "localStorage": {
             "key": "xyz"
-        }
+        },
+        "url": "/your-path-here"
     }
 ]
 
