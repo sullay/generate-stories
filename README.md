@@ -16,6 +16,7 @@ npx generate-stories -v path/to/vue/components -o path/to/storybook/stories
 - --viewsDir, -v：指定Vue文件所在的目录。
 - --outputDir, -o：指定故事文件将被生成的目录。
 - --help, -h：显示帮助信息。
+- --framework, -f:  vue3(default)、vue2
 
 ## .stories.json 配置说明
 要为您的Vue.js组件定义故事，请在组件文件所在的同一目录下创建一个与组件同名的.stories.json文件。该JSON文件应包含一个对象数组，每个对象代表一个故事及其自己的属性集props、url、window、localStorage 和 sessionStorage 设置。

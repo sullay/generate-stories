@@ -14,6 +14,7 @@ npx generate-stories -v path/to/vue/components -o path/to/storybook/stories
 - --viewsDir, -v: Specify the directory where Vue files are located.
 - --outputDir, -o: Specify the directory where story files will be generated.
 - --help, -h: Display the help information.
+- --framework, -f:  vue3(default)、vue2
 
 ## .stories.json Configuration
 To define the stories for your Vue.js components, create a .stories.json file in the same directory as your component file and with the same name. This JSON file should contain an array of objects, each representing a story with its own set of properties props, url, window, localStorage, and sessionStorage settings.
