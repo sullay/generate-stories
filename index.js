@@ -2,18 +2,22 @@
 const fs = require('fs').promises;
 const path = require('path');
 const minimist = require('minimist');
+const generateVue2 = require('./framework/generateVue2')
+const generateVue3 = require('./framework/generateVue3')
 
 // 解析命令行参数
 const argv = minimist(process.argv.slice(2), {
   alias: {
     h: 'help',
     v: 'viewsDir',
-    o: 'outputDir'
+    o: 'outputDir',
+    f: 'framework'
   },
-  string: ['viewsDir', 'outputDir'],
+  string: ['viewsDir', 'outputDir', 'framework'],
   boolean: ['help'],
   default: {
-    outputDir: './stories'
+    outputDir: './stories',
+    framework: 'vue3'
   }
 });
 
@@ -23,8 +27,9 @@ Usage: generate-stories [options]
 
 Options:
   --viewsDir, -v   Specify the directory where Vue files are located
-  --outputDir, -o  Specify the directory where story files will be generated
+  --outputDir, -o  Specify the directory where story files will be generated (default: "./stories")
   --help, -h       Show help
+  --framework, -f  vue3(default)、vue2
 `);
   process.exit(0);
 }
@@ -115,67 +120,19 @@ Default.args = {};`;
     controls: { include: ${JSON.stringify(controlsKeys)} }
   },`
 
-  return `
-import ${componentName} from '${importPath}';
-import { useRouter } from 'vue-router';
-import { reactive, watch } from 'vue';
-
-function extractAfterPrefix(prefix, inputString) {
-  if (inputString.startsWith(prefix)) {
-      return inputString.substring(prefix.length);
+  if (argv.framework === 'vue2') {
+    return generateVue2(componentName, importPath, titlePath, controlsParameters, defaultExport);
+  } else if (argv.framework === 'vue3') {
+    return generateVue3(componentName, importPath, titlePath, controlsParameters, defaultExport);
   }
-  return '';
-}
-
-function buildData(args, prefix) {
-  const data = {};
-  Object.keys(args).forEach((argsKey) => {
-      const key = extractAfterPrefix(prefix + '.', argsKey);
-      if (key) data[key] = args[argsKey];
-  });
-  return data;
-}
-
-export default {
-  title: 'Auto Generate Stories/${titlePath}',
-  component: ${componentName},
-  decorators: [() => ({ template: '<div><story /></div>' })],
-  ${controlsParameters}
-};
-
-class Template {
-    render(args) {
-        const props = reactive({});
-        Object.assign(window, buildData(args, 'window'));
-        Object.entries(buildData(args, 'localStorage')).forEach(([key, val]) => localStorage.setItem(key, val));
-        Object.entries(buildData(args, 'sessionStorage')).forEach(([key, val]) => sessionStorage.setItem(key, val));
-        return {
-            components: { ${componentName} },
-            setup() {
-                const router = useRouter();
-                watch(args, newArgs => {
-                    if (newArgs.url) {
-                        router.replace(newArgs.url);
-                    }
-                    Object.assign(props, buildData(newArgs, 'props'));
-                }, { immediate: true });
-                return { props };
-            },
-            template: '<${componentName} v-bind="props" />',
-        }
-    }
-}
-
-${defaultExport}
-`;
 }
 
 // Function to generate additional exports based on story data
 function generateExport(story) {
   const {
     title, props = {}, url,
-    window: windowOverrides = {}, 
-    localStorage: localStorageOverrides = {}, 
+    window: windowOverrides = {},
+    localStorage: localStorageOverrides = {},
     sessionStorage: sessionStorageOverrides = {}
   } = story;
 
